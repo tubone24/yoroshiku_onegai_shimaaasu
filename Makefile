@@ -5,4 +5,4 @@ build:
 	wasm-pack build --target web
 
 run-local:
-	python -m http.server 8080
+	cargo run --bin simple_server
