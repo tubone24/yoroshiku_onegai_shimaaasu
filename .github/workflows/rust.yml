@@ -27,6 +27,24 @@ jobs:
       run: cargo install wasm-pack
     - name: build
       run: wasm-pack build --target web
+    - name: Delete pkg .gitignore
+      run: rm pkg/.gitignore
+    - name: Setup git
+      env:
+        GITHUB_TOKEN: ${{ secrets.github_token }}
+      run: |
+        git config --local user.name GitHubActions
+        git remote set-url origin https://${GITHUB_ACTOR}:${GITHUB_TOKEN}@github.com/${GITHUB_REPOSITORY}.git
+    - name: Git commit
+      run: |
+        git checkout main
+        git pull origin main
+        git add -A
+        DIFF=`git diff --cached --numstat | wc -l`
+        if [ $DIFF -eq 0 ]; then
+          exit 0
+        fi
+        git commit -am 'GitHub Actions commit' --allow-empty
     - name: Deploy
       uses: peaceiris/actions-gh-pages@v3
       with:
