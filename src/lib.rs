@@ -8,6 +8,7 @@ use wasm_bindgen::JsCast;
 use num_bigint::{ToBigInt, BigInt};
 use num_traits::{Zero, One};
 use web_sys::console::log_1;
+use js_sys::Array;
 
 fn window() -> web_sys::Window {
     web_sys::window().expect("no global `window` exists")
@@ -29,67 +30,71 @@ extern {
 }
 
 #[wasm_bindgen]
-pub fn calc(c_str: &str, n_str: &str) -> Result<(), JsValue>{
+pub fn calc(e_str: &str, c_str: &str, n_str: &str, cheat: &str) -> Result<(), JsValue>{
+    // loading_onはJSでやる
+    //switch_loading(true);
+    let e: BigInt = e_str.parse::<BigInt>().unwrap();
     let n: BigInt = n_str.parse::<BigInt>().unwrap();
     let c: BigInt = c_str.parse::<BigInt>().unwrap();
-    let e: BigInt = 65537.to_bigint().unwrap();
 
     log(&format!("c={}", &c));
     log(&format!("n={}", &n));
     log(&format!("e={}", &e));
 
-    let first = 3.to_bigint().unwrap();
+    let mut first: BigInt;
+    if cheat == "yes" {
+        first = "32769132993266709549961988190834461413177642967992942539798288533".parse::<BigInt>().unwrap();
+    } else {
+        first = 3.to_bigint().unwrap();
+    }
     let step = 2.to_bigint().unwrap();
     for p in num_iter::range_step(first, &n + 0.to_bigint().unwrap(), step) {
         log(&format!("{}", &p));
-        // if &p % 1 == Zero::zero() {
-        //     log(&format!("{}", &p));
-        // }
         if &n % &p == Zero::zero(){
             let q: BigInt = &n / &p;
-            //let d = (&p - 1) * (&q - 1) + 1;
             let lcm = (&p - 1) * (&q - 1);
-
-            // let g = gcd(&e, &lcm);
-            // if g == 1.to_bigint().unwrap() {
-            //     continue;
-            // }
-            // log(&format!("g={}", &g));
-            //let d = (&lcm + 1) / &e;
-            let d = calc_d(&e, &lcm);
+            let d = calc_d(&e, &lcm, cheat);
             let m = c.modpow(&d, &n);
-            print_result(&p, &q, &d, &m);
+            let plain_text = replace_char(&format!("{}", &m));
+            switch_loading(false);
             alert(&format!("よろしくお願いしまぁぁぁすっ!!"));
-            log(&format!("c={}", &m.modpow(&e, &n)));
-            log(&format!("p*q={}", &p * &q));
+            print_result(&p, &q, &d, &m, &plain_text);
             return Ok(())
-            // if &lcm % &e == One::one() {
-            //     let d = (&lcm + 1) / &e;
-            //     let m = c.modpow(&d, &n) / e;
-            //     print_result(&p, &q, &d, &m);
-            //     alert(&format!("よろしくお願いしまぁぁぁすっ!!"));
-            //     return Ok(())
-            // }
         }
     }
+    switch_loading(false);
     alert(&format!("計算失敗！"));
     return Ok(())
 }
 
-fn print_result(p: &BigInt, q: &BigInt, d: &BigInt, m: &BigInt) {
+fn switch_loading(loading: bool){
+    let div_loading: web_sys::Element = get_element_by_id("loading");
+
+    if loading {
+        let arr = js_sys::Array::new();
+        let s = JsValue::from_str("loaded");
+        arr.set(0, s);
+        div_loading.class_list().remove(&arr);
+    } else {
+        let arr = js_sys::Array::new();
+        let s = JsValue::from_str("loaded");
+        arr.set(0, s);
+        div_loading.class_list().add(&arr);
+    }
+    
+}
+
+fn print_result(p: &BigInt, q: &BigInt, d: &BigInt, m: &BigInt, plain_text: &str) {
     let div_p: web_sys::HtmlDivElement = get_element_by_id("div_p");
     let div_q: web_sys::HtmlDivElement = get_element_by_id("div_q");
     let div_d: web_sys::HtmlDivElement = get_element_by_id("div_d");
     let div_m: web_sys::HtmlDivElement = get_element_by_id("div_m");
-    div_p.set_inner_text(&format!("p=, {}", p));
-    div_q.set_inner_text(&format!("q=, {}", q));
-    div_d.set_inner_text(&format!("d=, {}", d));
-    div_m.set_inner_text(&format!("m=, {}", m));
-}
-
-fn print_in_progress(p: &BigInt) {
-    let div_p: web_sys::HtmlDivElement = get_element_by_id("div_p");
-    div_p.set_inner_text(&format!("p=, {}", p));
+    let div_plain_text: web_sys::HtmlDivElement = get_element_by_id("div_plain_text");
+    div_p.set_inner_text(&format!("p={}", p));
+    div_q.set_inner_text(&format!("q={}", q));
+    div_d.set_inner_text(&format!("d={}", d));
+    div_m.set_inner_text(&format!("m={}", m));
+    div_plain_text.set_inner_text(plain_text);
 }
 
 fn get_element_by_id<T: JsCast>(id: &str) -> T {
@@ -110,9 +115,15 @@ fn gcd(a: &BigInt, b: &BigInt) -> BigInt{
     }
 }
 
-fn calc_d(e: &BigInt, lcm: &BigInt) -> BigInt{
+fn calc_d(e: &BigInt, lcm: &BigInt, cheat: &str) -> BigInt{
     let mut d = 1.to_bigint().unwrap();
-    for tmpd in num_iter::range_step(1.to_bigint().unwrap(), lcm + 0.to_bigint().unwrap(), 1.to_bigint().unwrap()) {
+    let mut first: BigInt;
+    if cheat == "yes" {
+        first = "106698614368578024442868771328920154780709906633937862801226224496631063125911774470873340168597462306553968544513277109053606095".parse::<BigInt>().unwrap();
+    } else {
+        first = 1.to_bigint().unwrap();
+    }
+    for tmpd in num_iter::range_step(first, lcm + 0.to_bigint().unwrap(), 1.to_bigint().unwrap()) {
         log(&format!("tmpd={}", &tmpd));
         if e * &tmpd % lcm == 1.to_bigint().unwrap() {
             return &tmpd + 0.to_bigint().unwrap()
@@ -121,55 +132,25 @@ fn calc_d(e: &BigInt, lcm: &BigInt) -> BigInt{
     return d
 }
 
-// fn ext_gcd(a: BigInt, b: BigInt) -> BigInt {
-//     let mut r0 = &a;
-//     let mut r1 = b;
-//     let mut s0 = 1.to_bigint().unwrap();
-//     let mut s1 = 0.to_bigint().unwrap();
-//     let mut t0 = 0.to_bigint().unwrap();
-//     let mut t1 = 1.to_bigint().unwrap();
-//     while &r1 != &(0.to_bigint().unwrap()) {
-//         let q = r0 / &r1;
-//         let r = r0 - &q * &r1;
-//         let s = &s0 - &q * &s1;
-//         let t = &t0 - &q * &t1;
-//         r0 = &r1;
-//         s0 = &s1 + 0.to_bigint().unwrap();
-//         t0 = &t1 + 0.to_bigint().unwrap();
-//         r1 = &r + 0.to_bigint().unwrap();
-//         s1 = &s + 0.to_bigint().unwrap();
-//         t1 = &t + 0.to_bigint().unwrap();
-//     }
-//     if &t0 < &(0.to_bigint().unwrap()) {
-//         return &t0 + &a + 0.to_bigint().unwrap();
-//     } else {
-//         return &t0 + 0.to_bigint().unwrap();
-//     }
-// }
+fn replace_char(number_str: &str) -> String{
+    let char_count = number_str.chars().count();
+    let mut result = String::from("");
+    for i in (0..char_count).step_by(2) {
+        let num1 = number_str.chars().nth(i).unwrap();
+        let num2 = number_str.chars().nth((i + 1)).unwrap();
+        let ch = (num1.to_string() + &num2.to_string()).replace("01", "A").replace("02", "B").replace("03", "C").replace("04", "D").replace("05", "E").replace("06", "F").replace("07", "G").replace("08", "H").replace("09", "I").replace("10", "J").replace("11", "K").replace("12", "L").replace("13", "M").replace("14", "N").replace("15", "O").replace("16", "P").replace("17", "Q").replace("18", "R").replace("19", "S").replace("20", "T").replace("21", "U").replace("22", "V").replace("23", "W").replace("24", "X").replace("25", "Y").replace("26", "Z").replace("00", " ");
+        result = result.clone().to_string() + &ch;
+    }
+    return result.to_string()
+}
 
-fn extended_euclidean(u: i64, v: i64) -> i64 {
-    let mut r0 = u;
-    let mut r1 = v;
-    let mut s0 = 1;
-    let mut s1 = 0;
-    let mut t0 = 0;
-    let mut t1 = 1;
-    while r1 != 0 {
-        let q = r0 / r1;
-        let r = r0 - q * r1;
-        let s = s0 - q * s1;
-        let t = t0 - q * t1;
-        r0 = r1;
-        s0 = s1;
-        t0 = t1;
-        r1 = r;
-        s1 = s;
-        t1 = t;
-    }
-    println!("{} * {} + {} * {} = {}", s0, u, t0, v, r0);
-    if t0 < 0 {
-        t0 + u
-    } else {
-        t0
-    }
+fn create_crypt() {
+    let e = "65537".parse::<BigInt>().unwrap();
+    let p = "32769132993266709549961988190834461413177642967992942539798288533".parse::<BigInt>().unwrap();
+    let q = "3490529510847650949147849619903898133417764638493387843990820577".parse::<BigInt>().unwrap();
+    let n = p * q;
+    log(&format!("nnnnnnnnnnn={}", &n));
+    let m = "11610410132109971031059932119111114100115329711410132115113117101971091051151043211111511510510211497103101328411132107110111119321051153211611132107110111119321161049711632121111117321071101111193211011111610410511010332841049711632105115321161041013211611411710132109101971101051101033211110232107110111119108101100103101".parse::<BigInt>().unwrap();
+    let c = m.modpow(&e, &n);
+    log(&format!("cccccccccc={}", &c));
 }
