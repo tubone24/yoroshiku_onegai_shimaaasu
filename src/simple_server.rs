@@ -2,12 +2,14 @@
 //https://qiita.com/taichitk/items/5661dda19661b1f4efaf
 
 extern crate httparse;
+extern crate chunked_transfer;
 
 use std::net::{TcpStream, TcpListener};
 use std::io::{Read, Write};
 use std::thread;
 use std::fs::File;
 use std::path::Path;
+use chunked_transfer::Encoder;
 
 
 fn main() {
@@ -32,7 +34,7 @@ fn handle_client(mut stream: TcpStream) {
         Some(ref path) => {
             println!("GET: path {}", path);
             let mut body = String::new();
-            let mut binaryBody: Vec::<u8>;
+            let mut binaryBody = Vec::new();
             if match_file(path) == "html" {
                 let mut html = read_html_file(path);
                 html.read_to_string(&mut body);
@@ -58,13 +60,21 @@ fn handle_client(mut stream: TcpStream) {
                 let data = res.as_bytes();
                 stream.write(data);
             } else if match_file(path) == "wasm" {
-                let mut css = read_other_file(path);
-                css.read_to_end(&mut binaryBody);
-//                let status = "HTTP/1.1 200 OK\r\n".to_string();
-//                let header = status + "Content-Type: application/wasm; charset=UTF-8\r\n\r\n";
-//                let res = header + &body + "\r\n";
-//                let data = res.as_bytes();
-                stream.write(&binaryBody);
+                let mut wasm = read_other_file(path);
+                wasm.read_to_end(&mut binaryBody);
+                let headers = [
+                    "HTTP/1.1 200 OK",
+                    "Content-type: application/wasm",
+                    "\r\n"
+                ];
+                let mut response = headers.join("\r\n")
+                    .to_string()
+                    .into_bytes();
+                response.extend(binaryBody);
+                match stream.write(&response) {
+                    Ok(_) => println!("Response sent"),
+                    Err(e) => println!("Failed sending response: {}", e),
+                }
             }
         },
         None => {

@@ -17,3 +17,23 @@ As an aside. In Japan, during reruns of Summer Wars, everyone yells `Yes, please
 This program challenges you to solve RSA cryptography by using [wasm-bindgen](https://github.com/rustwasm/wasm-bindgen) and launching WebAssembry created by Rust on your browser.
 
 Therefore, there is no need for a server for the calculation. It would be a shame if everyone had to run such a heavy script.
+
+## Precondition
+
+### Install wasm
+
+```
+make install-wasm
+```
+
+### Build wasm
+
+```
+make build
+```
+
+### Run simple server
+
+```
+make run-local
+```
