@@ -27,11 +27,9 @@ jobs:
       run: cargo install wasm-pack
     - name: build
       run: wasm-pack build --target web
-    - name: asset move
-      run: mkdir public && mv index.html index.css pkg/ public/ 
     - name: Deploy
       uses: peaceiris/actions-gh-pages@v3
       with:
         github_token: ${{ secrets.GITHUB_TOKEN }}
-        publish_dir: ./public
+        publish_dir: ./
         keep_files: true
