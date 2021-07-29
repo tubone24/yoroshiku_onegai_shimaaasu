@@ -91,7 +91,8 @@ pub fn calc(e_str: &str, c_str: &str, n_str: &str, cheat: &str) -> Result<(), Js
     let first: BigInt;
     let p: BigInt;
     if cheat == "yes" {
-        first = "32769132993266709549961988190834461413177642967992942539798288533".parse::<BigInt>().unwrap();
+        // answer: 32769132993266709549961988190834461413177642967992942539798288533
+        first = "32769132993266709549961988190834461413177642967992942539798211111".parse::<BigInt>().unwrap();
         //first = 3.to_bigint().unwrap();
         let step = 2.to_bigint().unwrap();
         p = find_p(&first, &n,&step);
@@ -189,6 +190,7 @@ fn replace_char_to_num(char_str: &str) -> String{
 
 fn find_p(first: &BigInt, n: &BigInt, step: &BigInt) -> BigInt{
     for p in num_iter::range_step(first + 0.to_bigint().unwrap(), n + 0.to_bigint().unwrap(), step + 0.to_bigint().unwrap()) {
+        log(&format!("try to find p...= {}", &p));
         if n % &p == Zero::zero() {
             log(&format!("find p!! p={}", &p));
             return p
