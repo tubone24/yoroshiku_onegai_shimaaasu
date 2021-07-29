@@ -71,7 +71,8 @@
     </p>
     d(秘密鍵)の計算の手順は<a href="https://ja.wikipedia.org/wiki/RSA%E6%9A%97%E5%8F%B7" target="_blank"
                     rel="noopener noreferrer">RSA暗号</a>をご参照ください<br/>
-    <p>これらの計算はwasm-bindgenを使ってWasmで計算処理をさせるようにしてますが、Rustなんてほとんど書かないので無駄がいっぱいあると思います</p>
+    <p>これらの計算は<a href="https://github.com/rustwasm/wasm-bindgen" target="_blank"
+                 rel="noopener noreferrer">wasm-bindgen</a>を使ってWasmで計算処理をさせるようにしてますが、Rustなんてほとんど書かないので無駄がいっぱいあると思います</p>
     <small>※本ホームページの利用により発生した利用者の損害全てに対し、いかなる責任をも負わないものとし、損害賠償をする一切の義務はないものとします</small>
     <hr/>
     public exponent（公開指数）<br/>
@@ -88,7 +89,8 @@
             src="http://chart.apis.google.com/chart?cht=tx&chl=q">の積だよ。これだけの桁数になると君たちのゲーミングPCを持っても計算できないくらいの計算量になってしまうのでOZのパスワードも安心だね
     </small>
     <br/>
-    <small><font size="1">都合(数学オリンピックチート機能)によりnは固定とさせていただいております。ただtextareaをreadonlyにしているだけなのでハックしたい人は開発者ツールからどうぞ</font></small>
+    <small><font size="1">都合(数学オリンピックチート機能)によりnは固定とさせていただいております。ただtextareaをreadonlyにしているだけなのでハックしたい人は開発者ツールからどうぞ</font>
+    </small>
     <br/>
     <textarea rows="10" cols="60" id="n" readonly>114381625757888867669235779976146612010218296721242362562561842935706935245733897830597123563958705058989075147599290026879543541</textarea><br/><br/>
     <label><input type="checkbox" id="cheat" value="yes" checked>数学オリンピックチート(健二くんのように一瞬で素因数分解ができるチート)</label><br/><br/>
@@ -110,7 +112,8 @@
 <div id="div_d">
     d=0
 </div>
-<small><font size="1">d: <img src="http://chart.apis.google.com/chart?cht=tx&chl=d%3De%5E-1%20%5Cquad%20mod%20%5Cquad%20%5Cphi">で算出することのできる秘密鍵でここでは<a
+<small><font size="1">d: <img
+        src="http://chart.apis.google.com/chart?cht=tx&chl=d%3De%5E-1%20%5Cquad%20mod%20%5Cquad%20%5Cphi">で算出することのできる秘密鍵でここでは<a
         href="https://ja.wikipedia.org/wiki/%E3%83%A6%E3%83%BC%E3%82%AF%E3%83%AA%E3%83%83%E3%83%89%E3%81%AE%E4%BA%92%E9%99%A4%E6%B3%95#%E6%8B%A1%E5%BC%B5%E3%81%95%E3%82%8C%E3%81%9F%E4%BA%92%E9%99%A4%E6%B3%95"
         target="_blank" rel="noopener noreferrer">拡張ユークリッド互除法</a>を使って求めてます (注)<img
         src="http://chart.apis.google.com/chart?cht=tx&chl=%5Cphi%20%3D%20lcm(p%20-%201%2C%20q-1)"> を表しており<img
