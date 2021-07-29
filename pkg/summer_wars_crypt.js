@@ -206,6 +206,10 @@ export function create_crypt_num(e_str, n_str, plain_text) {
     wasm.create_crypt_num(ptr0, len0, ptr1, len1, ptr2, len2);
 }
 
+function getArrayU8FromWasm0(ptr, len) {
+    return getUint8Memory0().subarray(ptr / 1, ptr / 1 + len);
+}
+
 function isLikeNone(x) {
     return x === undefined || x === null;
 }
@@ -264,6 +268,44 @@ async function init(input) {
     };
     imports.wbg.__wbg_alert_5acb070cbf34e3b3 = function(arg0, arg1) {
         alert(getStringFromWasm0(arg0, arg1));
+    };
+    imports.wbg.__wbg_getRandomValues_1ef11e888e5228e9 = function(arg0, arg1, arg2) {
+        getObject(arg0).getRandomValues(getArrayU8FromWasm0(arg1, arg2));
+    };
+    imports.wbg.__wbg_randomFillSync_1b52c8482374c55b = function(arg0, arg1, arg2) {
+        getObject(arg0).randomFillSync(getArrayU8FromWasm0(arg1, arg2));
+    };
+    imports.wbg.__wbg_new_3a746f2619705add = function(arg0, arg1) {
+        var ret = new Function(getStringFromWasm0(arg0, arg1));
+        return addHeapObject(ret);
+    };
+    imports.wbg.__wbg_call_f54d3a6dadb199ca = function(arg0, arg1) {
+        var ret = getObject(arg0).call(getObject(arg1));
+        return addHeapObject(ret);
+    };
+    imports.wbg.__wbindgen_jsval_eq = function(arg0, arg1) {
+        var ret = getObject(arg0) === getObject(arg1);
+        return ret;
+    };
+    imports.wbg.__wbg_self_ac379e780a0d8b94 = function(arg0) {
+        var ret = getObject(arg0).self;
+        return addHeapObject(ret);
+    };
+    imports.wbg.__wbg_require_6461b1e9a0d7c34a = function(arg0, arg1) {
+        var ret = require(getStringFromWasm0(arg0, arg1));
+        return addHeapObject(ret);
+    };
+    imports.wbg.__wbg_crypto_1e4302b85d4f64a2 = function(arg0) {
+        var ret = getObject(arg0).crypto;
+        return addHeapObject(ret);
+    };
+    imports.wbg.__wbindgen_is_undefined = function(arg0) {
+        var ret = getObject(arg0) === undefined;
+        return ret;
+    };
+    imports.wbg.__wbg_getRandomValues_1b4ba144162a5c9e = function(arg0) {
+        var ret = getObject(arg0).getRandomValues;
+        return addHeapObject(ret);
     };
     imports.wbg.__wbg_instanceof_Window_11e25482011fc506 = function(arg0) {
         var ret = getObject(arg0) instanceof Window;
@@ -333,10 +375,6 @@ async function init(input) {
         var ret = global.global;
         return addHeapObject(ret);
     }, arguments) };
-    imports.wbg.__wbindgen_is_undefined = function(arg0) {
-        var ret = getObject(arg0) === undefined;
-        return ret;
-    };
     imports.wbg.__wbindgen_debug_string = function(arg0, arg1) {
         var ret = debugString(getObject(arg1));
         var ptr0 = passStringToWasm0(ret, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);

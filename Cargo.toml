@@ -10,10 +10,13 @@ crate-type = ["cdylib"]
 
 [dependencies]
 wasm-bindgen = "0.2"
-num-bigint = "0.4"
+rand = { version = "0.6.3", features = ["wasm-bindgen"] }
+# Versionが古いのはrandがうまく入らないから。https://github.com/rust-num/num-bigint/issues/61
+num-bigint = { version = "0.2", features = ["rand"] }
 num-iter = "0.1.42"
 num-traits = "0.2.14"
 js-sys = "0.3.51"
+httparse = "1.4.1"
 
 [dependencies.web-sys]
 version = "0.3.51"
@@ -27,3 +30,7 @@ features = [
  "Window",
  "console"
 ]
+
+[[bin]]
+name = "simple_server"
+path = "src/simple_server.rs"
