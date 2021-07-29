@@ -5,6 +5,58 @@
         <link rel="stylesheet" href="index.css">
     </head>
     <body>
+        <script>
+            function checkEncPlainTextForm($this){
+                var str=$this.value;
+                while(str.match(/[^A-Z ]/))
+                {
+                    str=str.replace(/[^A-Z ]/,"");
+                }
+                $this.value=str;
+            }
+            function checkNumberForm($this){
+                var str=$this.value;
+                while(str.match(/[^/d]/))
+                {
+                    str=str.replace(/[^/d]/,"");
+                }
+                $this.value=str;
+            }
+
+        </script>
+        <script type="module">
+            document.querySelector('#yoroshiku').addEventListener('click', buttonClickYoroshiku);
+            document.querySelector('#enc').addEventListener('click', buttonClickEnc);
+            function buttonClickYoroshiku(){
+                const spinner = document.getElementById('loading');
+                spinner.classList.remove("loaded");
+                const e = document.getElementById("e").value;
+                const c = document.getElementById("c").value;
+                const n = document.getElementById("n").value;
+                const cheat = document.getElementById("cheat").checked;
+                init()
+                .then(() => {
+                    if (cheat) {
+                        calc(e, c, n, "yes");
+                    } else {
+                        calc(e, c, n, "cheat");
+                    }
+                });
+            }
+            function buttonClickEnc(){
+                const spinner = document.getElementById('loading');
+                spinner.classList.remove("loaded");
+                const e = document.getElementById("e").value;
+                const enc_plain_text = document.getElementById("enc_plain_text").value;
+                const n = document.getElementById("n").value;
+                init()
+                .then(() => {
+                    create_crypt_num(e, n, enc_plain_text);
+                });
+            }
+            import init, {calc, create_crypt_num} from "./pkg/summer_wars_crypt.js";
+        </script>
+        <div class="bgImage">
         <h1>よろしくお願いしまぁぁぁすっ!!</h1>
         <h2>WebAssemblyを使って健二くんの凄さを体感しよう！</h2>
         <p>健二くんが解いた暗号と多分同じ種類のRSA暗号を解読してみましょう</p>
@@ -13,34 +65,14 @@
         <hr/>
         <form>
             public exponent（公開指数）<br/>
-            <input type="text" id="e" value="9007"><br/>
+            <input type="text" id="e" value="9007" onInput="checkNumberForm(this)"><br/>
             cypher (暗号文)<br/>
-            <textarea rows="10" cols="60" id="c">96869613754622061477140922254355882905759991124574319874695120930816298225145708356931476622883989628013391990551829945157815154</textarea><br/>
+            <textarea rows="10" cols="60" id="c" onInput="checkNumberForm(this)">96869613754622061477140922254355882905759991124574319874695120930816298225145708356931476622883989628013391990551829945157815154</textarea><br/>
             modulus（法）<br/>
-            <textarea rows="10" cols="60" id="n">114381625757888867669235779976146612010218296721242362562561842935706935245733897830597123563958705058989075147599290026879543541</textarea><br/><br/>
-            <label><input type="checkbox" id="cheat" value="yes" checked>数学オリンピックチート</label>
+            <textarea rows="10" cols="60" id="n" readonly>114381625757888867669235779976146612010218296721242362562561842935706935245733897830597123563958705058989075147599290026879543541</textarea><br/><br/>
+            <label><input type="checkbox" id="cheat" value="yes" checked>数学オリンピックチート(健二くんのように一瞬でmod計算ができるマジック)</label>
         </form>
         <input type="button" id="yoroshiku" value="よろしくお願いしまぁぁぁすっ!!" />
-        <script type="module">
-        import init, {calc} from "./pkg/summer_wars_crypt.js";
-        document.querySelector('#yoroshiku').addEventListener('click', buttonClick);
-        function buttonClick(){
-            const spinner = document.getElementById('loading');
-            spinner.classList.remove("loaded");
-            const e = document.getElementById("e").value;
-            const c = document.getElementById("c").value;
-            const n = document.getElementById("n").value;
-            const cheat = document.getElementById("cheat").checked;
-            init()
-            .then(() => {
-                if (cheat) {
-                    calc(e, c, n, "yes");
-                } else {
-                    calc(e, c, n, "cheat");
-                }
-            });
-        }
-        </script>
         <div id="loading" class="loaded">
             <div class="spinner"></div>
         </div>
@@ -57,7 +89,21 @@
             m=0
         </div>
         <b><div id="div_plain_text">
-            
+            plainText=
         </div></b>
+        <hr/>
+        <p>暗号化</p>
+        平文(大文字英字+半角スペース)<br/>
+        <textarea rows="10" cols="60" id="enc_plain_text" onInput="checkEncPlainTextForm(this)">THE MAGIC WORDS ARE SQUEAMISH OSSIFRAGE</textarea><br/>
+        <input type="button" id="enc" value="暗号化" />
+        符号化<br/>
+        <div id="div_crypt_m">
+            m=0
+        </div>
+        暗号文<br/>
+        <div id="div_crypt_c">
+            c=0
+        </div>
+    </div>
     </body>
 </html>
