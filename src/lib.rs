@@ -106,9 +106,9 @@ pub fn calc(e_str: &str, c_str: &str, n_str: &str, cheat: &str) -> Result<(), Js
     log(&format!("d={}", &d));
     let m = c.modpow(&d, &n);
     let plain_text = replace_num_to_char(&format!("{}", &m));
-    switch_loading(false);
     alert(&format!("よろしくお願いしまぁぁぁすっ!!"));
     print_result(&p, &q, &d, &m, &plain_text);
+    switch_loading(false);
     return Ok(())
 }
 
