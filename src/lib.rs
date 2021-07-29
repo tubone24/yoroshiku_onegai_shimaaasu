@@ -5,7 +5,8 @@ extern crate num_traits;
 
 use wasm_bindgen::prelude::*;
 use wasm_bindgen::JsCast;
-use num_bigint::{ToBigInt, BigInt};
+use num_bigint::{ToBigInt, BigInt, RandBigInt};
+use rand::prelude::*;
 use num_traits::{Zero};
 use web_sys::console::log_1;
 
@@ -47,7 +48,7 @@ fn switch_loading(loading: bool){
         arr.set(0, s);
         div_loading.class_list().add(&arr).expect("no className");
     }
-    
+
 }
 
 fn print_result(p: &BigInt, q: &BigInt, d: &BigInt, m: &BigInt, plain_text: &str) {
@@ -88,28 +89,25 @@ pub fn calc(e_str: &str, c_str: &str, n_str: &str, cheat: &str) -> Result<(), Js
     log(&format!("e={}", &e));
 
     let first: BigInt;
+    let p: BigInt;
     if cheat == "yes" {
         first = "32769132993266709549961988190834461413177642967992942539798288533".parse::<BigInt>().unwrap();
+        //first = 3.to_bigint().unwrap();
+        let step = 2.to_bigint().unwrap();
+        p = find_p(&first, &n,&step);
     } else {
-        first = 3.to_bigint().unwrap();
+        p = pollard_rho(&n);
+        log(&format!("p={}", &p));
     }
-    let step = 2.to_bigint().unwrap();
-    for p in num_iter::range_step(first, &n + 0.to_bigint().unwrap(), step) {
-        log(&format!("{}", &p));
-        if &n % &p == Zero::zero(){
-            let q: BigInt = &n / &p;
-            let lcm = (&p - 1) * (&q - 1);
-            let d = calc_d_with_ext_gcd(&e, &lcm);
-            let m = c.modpow(&d, &n);
-            let plain_text = replace_num_to_char(&format!("{}", &m));
-            switch_loading(false);
-            alert(&format!("よろしくお願いしまぁぁぁすっ!!"));
-            print_result(&p, &q, &d, &m, &plain_text);
-            return Ok(())
-        }
-    }
+    let q: BigInt = &n / &p;
+    let lcm = (&p - 1) * (&q - 1);
+    let d = calc_d_with_ext_gcd(&e, &lcm);
+    log(&format!("d={}", &d));
+    let m = c.modpow(&d, &n);
+    let plain_text = replace_num_to_char(&format!("{}", &m));
     switch_loading(false);
-    alert(&format!("計算失敗！"));
+    alert(&format!("よろしくお願いしまぁぁぁすっ!!"));
+    print_result(&p, &q, &d, &m, &plain_text);
     return Ok(())
 }
 
@@ -125,8 +123,8 @@ pub fn create_crypt_num(e_str: &str, n_str: &str, plain_text: &str) -> Result<()
 }
 
 fn gcd(a: &BigInt, b: &BigInt) -> BigInt{
-    log(&format!("with gcd:  a={} b={}", a, b));
-    if b == &(0.to_bigint().unwrap()) { 
+    //log(&format!("with gcd:  a={} b={}", a, b));
+    if b == &(0.to_bigint().unwrap()) {
         return a + 0.to_bigint().unwrap();
     } else {
         gcd(&b, &(a%b))
@@ -187,4 +185,43 @@ fn replace_char_to_num(char_str: &str) -> String{
         }
     }
     return result.to_string()
+}
+
+fn find_p(first: &BigInt, n: &BigInt, step: &BigInt) -> BigInt{
+    for p in num_iter::range_step(first + 0.to_bigint().unwrap(), n + 0.to_bigint().unwrap(), step + 0.to_bigint().unwrap()) {
+        if n % &p == Zero::zero() {
+            log(&format!("find p!! p={}", &p));
+            return p
+        }
+    }
+    switch_loading(false);
+    alert(&format!("計算失敗！"));
+    return  0.to_bigint().unwrap();
+}
+
+fn rho_f(x: &BigInt, a: &BigInt, n: &BigInt) -> BigInt{
+    log(&format!("rho f:  x={} a={} n={}", x, a, n));
+    return (x * x + a) % n
+}
+
+fn generate_bigint_rand(high: &BigInt) -> BigInt {
+    let mut rng = thread_rng();
+    let low = 0.to_bigint().unwrap();
+    let b = rng.gen_bigint_range(&low, high);
+    return b
+}
+
+fn pollard_rho(n: &BigInt) -> BigInt{
+    loop {
+        let x = generate_bigint_rand(n);
+        let y = generate_bigint_rand(n);
+        let a =  1.to_bigint().unwrap() +  generate_bigint_rand(&(n - 3.to_bigint().unwrap()));
+        let x2 = rho_f(&x, &a, n);
+        let y2 = rho_f(&y, &a, n);
+        let y3 = rho_f(&y2, &a, n);
+        let d = gcd(&(x2 - y3), n);
+        if d > 1.to_bigint().unwrap() {
+            return d
+        }
+    }
 }
