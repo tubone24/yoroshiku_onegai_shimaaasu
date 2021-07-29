@@ -16,8 +16,8 @@
 
   function checkNumberForm($this) {
     var str = $this.value;
-    while (str.match(/[^/d]/)) {
-      str = str.replace(/[^/d]/, "");
+    while (str.match(/[^0-9]/)) {
+      str = str.replace(/[^/0-9]/, "");
     }
     $this.value = str;
   }
