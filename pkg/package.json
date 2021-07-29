@@ -1,0 +1,12 @@
+{
+  "name": "summer-wars-crypt",
+  "version": "0.1.0",
+  "files": [
+    "summer_wars_crypt_bg.wasm",
+    "summer_wars_crypt.js",
+    "summer_wars_crypt.d.ts"
+  ],
+  "module": "summer_wars_crypt.js",
+  "types": "summer_wars_crypt.d.ts",
+  "sideEffects": false
+}
